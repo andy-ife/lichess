@@ -7,7 +7,7 @@ import 'package:lichess_mobile/src/model/message/message_repository.dart';
 import 'package:lichess_mobile/src/model/tournament/tournament_providers.dart';
 import 'package:lichess_mobile/src/view/home/following_carousel.dart';
 
-final appRefreshProvider = Provider.autoDispose<AppRefreshService>(
+final appRefreshServiceProvider = Provider.autoDispose<AppRefreshService>(
   (ref) => AppRefreshService(ref),
   name: 'AppRefreshProvider',
 );

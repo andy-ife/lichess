@@ -4,7 +4,6 @@ import 'package:fast_immutable_collections/fast_immutable_collections.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/experimental/mutation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lichess_mobile/src/service/app_refresh_service.dart';
 import 'package:lichess_mobile/src/binding/binding.dart';
 import 'package:lichess_mobile/src/model/account/account_repository.dart';
 import 'package:lichess_mobile/src/model/account/home_preferences.dart';
@@ -25,6 +24,7 @@ import 'package:lichess_mobile/src/model/tournament/tournament.dart';
 import 'package:lichess_mobile/src/model/tournament/tournament_providers.dart';
 import 'package:lichess_mobile/src/model/user/user.dart';
 import 'package:lichess_mobile/src/network/connectivity.dart';
+import 'package:lichess_mobile/src/service/app_refresh_service.dart';
 import 'package:lichess_mobile/src/styles/lichess_icons.dart';
 import 'package:lichess_mobile/src/styles/styles.dart';
 import 'package:lichess_mobile/src/tab_navigation.dart';
@@ -133,7 +133,7 @@ class _HomeScreenState() extends ConsumerState<HomeTabScreen> {
 
         if (!hasRefreshed && !wasOnline && isNowOnline) {
           hasRefreshed = true;
-          ref.read(appRefreshProvider).refreshApp(isOnline: isNowOnline);
+          ref.read(appRefreshServiceProvider).refreshApp(isOnline: isNowOnline);
         }
 
         wasOnline = isNowOnline;
@@ -406,7 +406,7 @@ class _HomeScreenState() extends ConsumerState<HomeTabScreen> {
                   if (duration.inSeconds < 10) {
                     return;
                   }
-                  ref.read(appRefreshProvider).refreshApp(isOnline: isOnline);
+                  ref.read(appRefreshServiceProvider).refreshApp(isOnline: isOnline);
                 }
               },
               child: _IsEditingHome(
@@ -435,7 +435,8 @@ class _HomeScreenState() extends ConsumerState<HomeTabScreen> {
                           // Not gated on the connectivity status: the device may be marked
                           // offline while its network is back, and the responses to these
                           // requests are what tell the connectivity check to run again.
-                          onRefresh: () => ref.read(appRefreshProvider).refreshApp(isOnline: true),
+                          onRefresh: () =>
+                              ref.read(appRefreshServiceProvider).refreshApp(isOnline: true),
                           child: content,
                         ),
                   floatingActionButton: widget.editModeEnabled || isTablet

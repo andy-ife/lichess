@@ -9,7 +9,6 @@ import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:l10n_esperanto/l10n_esperanto.dart';
 import 'package:lichess_mobile/l10n/l10n.dart';
-import 'package:lichess_mobile/src/service/app_refresh_service.dart';
 import 'package:lichess_mobile/src/binding/binding.dart';
 import 'package:lichess_mobile/src/constants.dart';
 import 'package:lichess_mobile/src/intl.dart';
@@ -27,6 +26,7 @@ import 'package:lichess_mobile/src/service/account_service.dart';
 import 'package:lichess_mobile/src/service/announce_service.dart';
 import 'package:lichess_mobile/src/service/app_links_service.dart';
 import 'package:lichess_mobile/src/service/app_log_service.dart';
+import 'package:lichess_mobile/src/service/app_refresh_service.dart';
 import 'package:lichess_mobile/src/service/broadcast_service.dart';
 import 'package:lichess_mobile/src/service/challenge_service.dart';
 import 'package:lichess_mobile/src/service/correspondence_service.dart';
@@ -234,7 +234,9 @@ class _AppState() extends ConsumerState<Application> {
           if (duration.inSeconds < 10) {
             return;
           }
-          ref.read(appRefreshProvider).refreshApp(isOnline: ref.read(isDeviceOnlineProvider));
+          ref
+              .read(appRefreshServiceProvider)
+              .refreshApp(isOnline: ref.read(isDeviceOnlineProvider));
         }
       },
     );
