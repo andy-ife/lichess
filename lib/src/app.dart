@@ -234,7 +234,7 @@ class _AppState() extends ConsumerState<Application> {
           if (duration.inSeconds < 10) {
             return;
           }
-          ref.read(appRefreshProvider).refreshApp();
+          ref.read(appRefreshProvider).refreshApp(isOnline: ref.read(isDeviceOnlineProvider));
         }
       },
     );

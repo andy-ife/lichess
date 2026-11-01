@@ -133,7 +133,7 @@ class _HomeScreenState() extends ConsumerState<HomeTabScreen> {
 
         if (!hasRefreshed && !wasOnline && isNowOnline) {
           hasRefreshed = true;
-          ref.read(appRefreshProvider).refreshApp();
+          ref.read(appRefreshProvider).refreshApp(isOnline: isNowOnline);
         }
 
         wasOnline = isNowOnline;
@@ -406,7 +406,7 @@ class _HomeScreenState() extends ConsumerState<HomeTabScreen> {
                   if (duration.inSeconds < 10) {
                     return;
                   }
-                  ref.read(appRefreshProvider).refreshApp();
+                  ref.read(appRefreshProvider).refreshApp(isOnline: isOnline);
                 }
               },
               child: _IsEditingHome(
