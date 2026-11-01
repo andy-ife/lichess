@@ -419,7 +419,7 @@ class _HomeScreenState() extends ConsumerState<HomeTabScreen> {
                         // Not gated on the connectivity status: the device may be marked
                         // offline while its network is back, and the responses to these
                         // requests are what tell the connectivity check to run again.
-                        onRefresh: ref.read(appRefreshProvider).refreshApp,
+                        onRefresh: () => ref.read(appRefreshProvider).refreshApp(isOnline: true),
                         child: content,
                       ),
                 floatingActionButton: widget.editModeEnabled || isTablet
