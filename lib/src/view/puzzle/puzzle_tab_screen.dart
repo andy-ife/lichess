@@ -184,8 +184,7 @@ Widget _buildMainListItem(
         onTap: () {
           Navigator.of(
             context,
-            rootNavigator: true,
-          ).push(PuzzleScreen.buildRoute(angle: const PuzzleTheme(PuzzleThemeKey.mix)));
+          ).pushHidingTabBar(PuzzleScreen.buildRoute(angle: const PuzzleTheme(PuzzleThemeKey.mix)));
         },
       );
     default:
@@ -193,7 +192,7 @@ Widget _buildMainListItem(
       return PuzzleAnglePreview(
         angle: angle,
         onTap: () {
-          Navigator.of(context, rootNavigator: true).push(PuzzleScreen.buildRoute(angle: angle));
+          Navigator.of(context).pushHidingTabBar(PuzzleScreen.buildRoute(angle: angle));
         },
       );
   }
@@ -275,7 +274,7 @@ class const _PuzzleMenu() extends ConsumerWidget {
               (context.l10n.puzzleStreakDescription.contains('.') ? '.' : ''),
           onTap: isOnline
               ? () {
-                  Navigator.of(context, rootNavigator: true).push(StreakScreen.buildRoute());
+                  Navigator.of(context).pushHidingTabBar(StreakScreen.buildRoute());
                 }
               : null,
         ),
@@ -286,7 +285,7 @@ class const _PuzzleMenu() extends ConsumerWidget {
           subtitle: context.l10n.mobilePuzzleStormSubtitle,
           onTap: isOnline
               ? () {
-                  Navigator.of(context, rootNavigator: true).push(StormScreen.buildRoute());
+                  Navigator.of(context).pushHidingTabBar(StormScreen.buildRoute());
                 }
               : null,
         ),
@@ -303,13 +302,10 @@ class const _PuzzleMenu() extends ConsumerWidget {
           _PuzzleMenuListTile(
             icon: Icons.history_outlined,
             title: context.l10n.puzzleHistory,
-            subtitle: 'Review your past puzzle attempts.',
+            subtitle: context.l10n.mobilePuzzleHistoryDescription,
             enabled: isOnline,
             onTap: isOnline
-                ? () => Navigator.of(
-                    context,
-                    rootNavigator: true,
-                  ).push(PuzzleHistoryScreen.buildRoute())
+                ? () => Navigator.of(context).pushHidingTabBar(PuzzleHistoryScreen.buildRoute())
                 : null,
           ),
         ],
@@ -391,7 +387,6 @@ class const DailyPuzzle({super.key}) extends ConsumerWidget {
       data: (data) {
         final preview = PuzzlePreview.fromPuzzle(data);
         return SmallBoardPreview(
-          dimInDarkMode: true,
           orientation: preview.orientation,
           fen: preview.initialFen,
           lastMove: preview.initialMove,
@@ -432,7 +427,7 @@ class const DailyPuzzle({super.key}) extends ConsumerWidget {
           ),
           onTap: () {
             if (!context.mounted) return;
-            Navigator.of(context, rootNavigator: true).push(
+            Navigator.of(context).pushHidingTabBar(
               PuzzleScreen.buildRoute(angle: const PuzzleTheme(PuzzleThemeKey.mix), puzzle: data),
             );
           },
@@ -503,7 +498,6 @@ class const PuzzleAnglePreview({
                 ],
               ),
               child: SmallBoardPreview(
-                dimInDarkMode: true,
                 orientation: preview?.orientation ?? Side.white,
                 fen: preview?.initialFen ?? kEmptyFEN,
                 lastMove: preview?.initialMove,
