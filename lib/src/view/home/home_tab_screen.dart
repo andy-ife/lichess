@@ -28,6 +28,7 @@ import 'package:lichess_mobile/src/network/connectivity.dart';
 import 'package:lichess_mobile/src/styles/lichess_icons.dart';
 import 'package:lichess_mobile/src/styles/styles.dart';
 import 'package:lichess_mobile/src/tab_navigation.dart';
+import 'package:lichess_mobile/src/utils/focus_detector.dart';
 import 'package:lichess_mobile/src/utils/image.dart';
 import 'package:lichess_mobile/src/utils/l10n_context.dart';
 import 'package:lichess_mobile/src/utils/navigation.dart';
@@ -102,6 +103,8 @@ const String kHideHomeWidgetCustomizationTip = 'app_hide_home_widget_customizati
 class _HomeScreenState() extends ConsumerState<HomeTabScreen> {
   ImageColorWorker? _worker;
   final _refreshKey = GlobalKey<RefreshIndicatorState>();
+
+  DateTime? _focusLostAt;
 
   bool wasOnline = true;
   bool hasRefreshed = false;
@@ -393,38 +396,52 @@ class _HomeScreenState() extends ConsumerState<HomeTabScreen> {
               children: [if (unreadLichessMessage) const _LichessMessageBanner(), ...widgets],
             );
 
-            return _IsEditingHome(
-              isEditingWidgets: widget.editModeEnabled,
-              child: PlatformScaffold(
-                appBar: widget.editModeEnabled
-                    ? PlatformAppBar(
-                        title: Text(context.l10n.mobileSettingsHomeWidgets),
-                        leading: TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: Text(context.l10n.ok),
+            return FocusDetector(
+              onFocusLost: () {
+                _focusLostAt = DateTime.now();
+              },
+              onFocusRegained: () {
+                if (context.mounted && _focusLostAt != null) {
+                  final duration = DateTime.now().difference(_focusLostAt!);
+                  if (duration.inSeconds < 10) {
+                    return;
+                  }
+                  ref.read(appRefreshProvider).refreshApp();
+                }
+              },
+              child: _IsEditingHome(
+                isEditingWidgets: widget.editModeEnabled,
+                child: PlatformScaffold(
+                  appBar: widget.editModeEnabled
+                      ? PlatformAppBar(
+                          title: Text(context.l10n.mobileSettingsHomeWidgets),
+                          leading: TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text(context.l10n.ok),
+                          ),
+                          leadingWidth: 80.0,
+                          automaticallyImplyLeading: false,
+                        )
+                      : PlatformAppBar(
+                          // A greeting without a name when logged out.
+                          title: _GreetingWidget(authUser?.user, isOnline: isOnline),
+                          centerTitle: false,
+                          actions: const [_ChallengeScreenButton(), AccountMenuButton()],
                         ),
-                        leadingWidth: 80.0,
-                        automaticallyImplyLeading: false,
-                      )
-                    : PlatformAppBar(
-                        // A greeting without a name when logged out.
-                        title: _GreetingWidget(authUser?.user, isOnline: isOnline),
-                        centerTitle: false,
-                        actions: const [_ChallengeScreenButton(), AccountMenuButton()],
-                      ),
-                body: widget.editModeEnabled
-                    ? content
-                    : HapticRefreshIndicator(
-                        key: _refreshKey,
-                        // Not gated on the connectivity status: the device may be marked
-                        // offline while its network is back, and the responses to these
-                        // requests are what tell the connectivity check to run again.
-                        onRefresh: () => ref.read(appRefreshProvider).refreshApp(isOnline: true),
-                        child: content,
-                      ),
-                floatingActionButton: widget.editModeEnabled || isTablet
-                    ? null
-                    : const FloatingPlayButton(),
+                  body: widget.editModeEnabled
+                      ? content
+                      : HapticRefreshIndicator(
+                          key: _refreshKey,
+                          // Not gated on the connectivity status: the device may be marked
+                          // offline while its network is back, and the responses to these
+                          // requests are what tell the connectivity check to run again.
+                          onRefresh: () => ref.read(appRefreshProvider).refreshApp(isOnline: true),
+                          child: content,
+                        ),
+                  floatingActionButton: widget.editModeEnabled || isTablet
+                      ? null
+                      : const FloatingPlayButton(),
+                ),
               ),
             );
           },
