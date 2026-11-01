@@ -13,8 +13,11 @@ final appRefreshProvider = Provider.autoDispose<AppRefreshService>(
 );
 
 class AppRefreshService(final Ref ref) {
+  static bool isRefreshing = false;
   Future<void> refreshApp({required bool isOnline}) async {
+    if (isRefreshing) return;
     try {
+      isRefreshing = true;
       await Future.wait([
         ref.refresh(myRecentGamesProvider.future),
         if (isOnline) ref.refresh(challengesProvider.future),
@@ -28,6 +31,8 @@ class AppRefreshService(final Ref ref) {
       // Refreshing while the server is unavailable is expected to fail. Each
       // provider surfaces its own error, and the failed responses are what keep
       // the server status up to date, so there is nothing to do here.
+    } finally {
+      isRefreshing = false;
     }
   }
 }
