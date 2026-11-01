@@ -89,7 +89,7 @@ class _AppState() extends ConsumerState<Application> {
   final _navigatorKey = GlobalKey<NavigatorState>();
 
   late final AppLifecycleListener _appRefreshListener;
-  DateTime? _focusLostAt;
+  DateTime? _hiddenAt;
 
   // Adjusts some settings for small screens based on the MediaQuery data.
   Future<void> _screenSizeBasedInitialization(WidgetRef ref) async {
@@ -223,12 +223,14 @@ class _AppState() extends ConsumerState<Application> {
 
     // Listen for app lifecycle changes and refresh the app appropriately
     _appRefreshListener = AppLifecycleListener(
-      onPause: () {
-        _focusLostAt = DateTime.now();
+      onHide: () {
+        _hiddenAt = DateTime.now();
       },
       onResume: () {
-        if (context.mounted && _focusLostAt != null) {
-          final duration = DateTime.now().difference(_focusLostAt!);
+        final hiddenAt = _hiddenAt;
+        _hiddenAt = null;
+        if (context.mounted && hiddenAt != null) {
+          final duration = DateTime.now().difference(hiddenAt);
           if (duration.inSeconds < 10) {
             return;
           }
